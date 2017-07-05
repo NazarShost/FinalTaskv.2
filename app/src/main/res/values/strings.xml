@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">TenthTask</string>
+    <string name="write_file">Save File</string>
+    <string name="read_file">Read File</string>
+    <string name="write_file_sd">Save File on SD</string>
+    <string name="read_file_sd">Read File from SD</string>
+    <string name="edit_text">Write text to save</string>
+    <string name="write_text">Read text from file</string>
 </resources>
