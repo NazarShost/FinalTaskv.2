@@ -1,19 +1,24 @@
 package com.example.tenthtask;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Environment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -38,10 +43,15 @@ public class MainActivity extends Activity implements SensorEventListener {
     private ImageView magnet;
     private float RotateDegree = 0f;
     private SensorManager mSensorManager;
+    SQLiteDatabase SQLITEDATABASE;
     TextView Magneticc;
     TextView Baroment;
     TextView CompOrient;
     TextView sensor;
+    Button Submit,EditData;
+    String Name, PhoneNumber, Subject ;
+    Boolean CheckEditTextEmpty ;
+    String SQLiteQuery ;
 
 
     final String FILENAME = "file";
@@ -59,6 +69,25 @@ public class MainActivity extends Activity implements SensorEventListener {
         HeaderImage = (ImageView) findViewById(R.id.CompassView);
         weather = (ImageView) findViewById(R.id.weather);
         magnet = (ImageView) findViewById(R.id.magnet);
+
+        Submit = (Button)findViewById(R.id.button1);
+
+        Submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DBCreate();
+                SubmitData2SQLiteDB();
+            }
+        });
+
+        EditData = (Button)findViewById(R.id.button2);
+        EditData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, EditDataActivity.class);
+                startActivity(intent);
+            }
+        });
 
         CompOrient = (TextView) findViewById(R.id.Header);
         Magneticc = (TextView) findViewById(R.id.Magneticc);
@@ -251,6 +280,35 @@ public class MainActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    public void DBCreate(){
+        SQLITEDATABASE = openOrCreateDatabase("DemoDataBase", Context.MODE_PRIVATE, null);
+        SQLITEDATABASE.execSQL("CREATE TABLE IF NOT EXISTS demoTable(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR, phone_number VARCHAR, subject VARCHAR);");
+    }
+    public void SubmitData2SQLiteDB(){
+        Name = CompOrient.getText().toString();
+        PhoneNumber = Magneticc.getText().toString();
+        Subject = Baroment.getText().toString();
+        CheckEditTextIsEmptyOrNot( Name,PhoneNumber, Subject);
+        if(CheckEditTextEmpty == true)
+        {
+            SQLiteQuery = "INSERT INTO demoTable (name,phone_number,subject) VALUES('"+Name+"', '"+PhoneNumber+"', '"+Subject+"');";
+            SQLITEDATABASE.execSQL(SQLiteQuery);
+            Toast.makeText(MainActivity.this,"Data Submit Successfully", Toast.LENGTH_LONG).show();
+        }
+        else {
+            Toast.makeText(MainActivity.this,"Please Fill All the Fields", Toast.LENGTH_LONG).show();
+        }
+    }
+    public void CheckEditTextIsEmptyOrNot(String Name,String PhoneNumber, String subject ){
+        if(TextUtils.isEmpty(Name) || TextUtils.isEmpty(PhoneNumber) || TextUtils.isEmpty(Subject)){
+            CheckEditTextEmpty = false ;
+        }
+        else {
+            CheckEditTextEmpty = true ;
         }
     }
 }
